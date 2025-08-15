@@ -1,0 +1,6 @@
+/* This is the main CSS file for the pedidos-app project.
+   It includes Tailwind CSS directives for base styles, components, and utilities. */
+/* pedidos-app/src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

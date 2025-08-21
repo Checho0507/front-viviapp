@@ -16,7 +16,29 @@ function App() {
   const [valorTotal, setValorTotal] = useState(0);
 
   useEffect(() => {
-    const fetchPedidos = async () => {
+    const fetchResumen = async () => {
+      try {
+        // Usar el endpoint de resumen en lugar de calcular manualmente
+        const response = await fetch('https://back-viviapp.onrender.com/pedidos/resumen-general');
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        setTotalPedidos(data.total_pedidos);
+        setTotalHoy(parseFloat(data.total_hoy) || 0); // ✅ Conversión segura
+        setValorTotal(parseFloat(data.total_general) || 0); // ✅ Conversión segura
+
+      } catch (error) {
+        console.error('Error al cargar resumen:', error);
+        // Fallback: usar el método actual
+        fetchPedidosManual();
+      }
+    };
+
+    const fetchPedidosManual = async () => {
+      // Tu código actual como fallback
       try {
         const response = await fetch('https://back-viviapp.onrender.com/pedidos');
         if (!response.ok) {
@@ -26,14 +48,14 @@ function App() {
         const data: Pedido[] = await response.json();
         setTotalPedidos(data.length);
 
-        const hoy = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+        const hoy = new Date().toISOString().split('T')[0];
 
         let sumaHoy = 0;
         let sumaTotal = 0;
 
         data.forEach((pedido) => {
-          let valor = parseFloat(String(pedido.valor).replace(/,/g, '').trim()); // Conversión segura
-          if (isNaN(valor)) valor = 0; // Si no es número, se pone en 0
+          let valor = parseFloat(String(pedido.valor).replace(/,/g, '').trim());
+          if (isNaN(valor)) valor = 0;
 
           sumaTotal += valor;
 
@@ -49,8 +71,9 @@ function App() {
       }
     };
 
-    fetchPedidos();
+    fetchResumen();
   }, [refresh]);
+
 
   return (
     <div className="max-w-3xl mx-auto p-4">

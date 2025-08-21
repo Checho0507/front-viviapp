@@ -18,7 +18,7 @@ export async function createPedido(pedido: { distribuidor: string, valor: number
 }
 
 // src/services/pedidosService.ts
-const API_URL = "https://back-viviapp.onrender.com//pedidos";
+const API_URL = "https://back-viviapp.onrender.com/pedidos";
 
 export async function getPedidos() {
   try {

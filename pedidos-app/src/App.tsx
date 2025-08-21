@@ -5,8 +5,8 @@ import PedidoList from './components/pedidosList';
 interface Pedido {
   id: number;
   distribuidor: string;
-  fecha: string; // formato esperado: "YYYY-MM-DD" o "YYYY-MM-DDTHH:mm:ss"
-  valor: string | number; // lo hacemos flexible porque puede venir como string
+  fecha: string;
+  valor: string | number; // Puede venir como string
 }
 
 function App() {
@@ -24,22 +24,20 @@ function App() {
         }
 
         const data: Pedido[] = await response.json();
-
         setTotalPedidos(data.length);
 
-        // Obtener fecha actual en formato "YYYY-MM-DD"
-        const hoy = new Date();
-        const hoyString = hoy.toISOString().split('T')[0];
+        const hoy = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
 
         let sumaHoy = 0;
         let sumaTotal = 0;
 
         data.forEach((pedido) => {
-          const valor = Number(pedido.valor); // Convertimos a número siempre
+          let valor = parseFloat(String(pedido.valor).replace(/,/g, '').trim()); // Conversión segura
+          if (isNaN(valor)) valor = 0; // Si no es número, se pone en 0
+
           sumaTotal += valor;
 
-          // Comparar solo la parte de la fecha
-          if (pedido.fecha.slice(0, 10) === hoyString) {
+          if (pedido.fecha.slice(0, 10) === hoy) {
             sumaHoy += valor;
           }
         });

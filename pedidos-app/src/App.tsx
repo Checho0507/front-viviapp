@@ -5,8 +5,8 @@ import PedidoList from './components/pedidosList';
 interface Pedido {
   id: number;
   distribuidor: string;
-  fecha: string; // Se asume que viene en formato "YYYY-MM-DD" o "YYYY-MM-DDTHH:mm:ss"
-  valor: number;
+  fecha: string; // formato esperado: "YYYY-MM-DD" o "YYYY-MM-DDTHH:mm:ss"
+  valor: string | number; // lo hacemos flexible porque puede venir como string
 }
 
 function App() {
@@ -27,19 +27,20 @@ function App() {
 
         setTotalPedidos(data.length);
 
-        // Obtener fecha actual en Colombia (sin UTC)
+        // Obtener fecha actual en formato "YYYY-MM-DD"
         const hoy = new Date();
-        const hoyString = hoy.toISOString().split('T')[0]; // YYYY-MM-DD
+        const hoyString = hoy.toISOString().split('T')[0];
 
         let sumaHoy = 0;
         let sumaTotal = 0;
 
         data.forEach((pedido) => {
-          sumaTotal += pedido.valor;
+          const valor = Number(pedido.valor); // Convertimos a número siempre
+          sumaTotal += valor;
 
-          // Comparar solo la parte de la fecha (los primeros 10 caracteres)
+          // Comparar solo la parte de la fecha
           if (pedido.fecha.slice(0, 10) === hoyString) {
-            sumaHoy += pedido.valor;
+            sumaHoy += valor;
           }
         });
 
@@ -65,11 +66,15 @@ function App() {
         </div>
         <div className="bg-green-100 p-4 rounded-lg text-center shadow">
           <p className="text-lg font-semibold">Valor Hoy</p>
-          <p className="text-2xl font-bold">${totalHoy.toLocaleString()}</p>
+          <p className="text-2xl font-bold">
+            {totalHoy.toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}
+          </p>
         </div>
         <div className="bg-purple-100 p-4 rounded-lg text-center shadow">
           <p className="text-lg font-semibold">Valor Total</p>
-          <p className="text-2xl font-bold">${valorTotal.toLocaleString()}</p>
+          <p className="text-2xl font-bold">
+            {valorTotal.toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}
+          </p>
         </div>
       </div>
 

@@ -7,7 +7,7 @@ export interface Pedido {
 }
 
 export async function createPedido(pedido: { distribuidor: string, valor: number, fecha: string, descripcion?: string }) {
-  const response = await fetch('http://127.0.0.1:8000/pedidos', {
+  const response = await fetch('https://back-viviapp.onrender.com/pedidos', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(pedido),
@@ -18,7 +18,7 @@ export async function createPedido(pedido: { distribuidor: string, valor: number
 }
 
 // src/services/pedidosService.ts
-const API_URL = "http://127.0.0.1:8000/pedidos";
+const API_URL = "https://back-viviapp.onrender.com//pedidos";
 
 export async function getPedidos() {
   try {

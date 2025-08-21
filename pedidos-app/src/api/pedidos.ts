@@ -1,4 +1,4 @@
-const API_BASE = 'https://back-viviapp.onrender.com/api';
+const API_BASE = 'https://back-viviapp.onrender.com';
 
 export interface Pedido {
   id?: number;
@@ -16,7 +16,7 @@ export async function obtenerPedidos(): Promise<Pedido[]> {
 }
 
 export async function agregarPedido(pedido: Pedido): Promise<Pedido> {
-  const res = await fetch(`https:127.0.0.1:8000/pedidos`, {
+  const res = await fetch(`${API_BASE}/pedidos`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(pedido),

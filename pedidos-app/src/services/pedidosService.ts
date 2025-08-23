@@ -1,4 +1,32 @@
-// src/services/pedidosService.ts
+// src/services/api.ts
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'https://back-viviapp.onrender.com', // Cambia si tu backend tiene otra URL base
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+export default api;
+
+export const addPagado = async (pedido: any) => {
+  await api.post('/pagados/agregar', pedido);
+};
+
+export const exportPagados = async () => {
+  const response = await api.get('/pagados/exportar', {
+    responseType: 'blob'
+  });
+
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'pagados.xlsx');
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+};
 export interface Pedido {
   distribuidor: string;
   valor: number;

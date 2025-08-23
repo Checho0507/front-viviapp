@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { getPedidos, deletePedido } from '../services/pedidosService'; // Asegúrate de importar deletePedido
+import { getPedidos, deletePedido, addPagado } from '../services/pedidosService'; // Asegúrate de importar deletePedido
 
 // Definir tipos para los datos
 interface Pedido {
@@ -25,7 +25,7 @@ export default function PedidoList({ refresh, onPedidoDeleted }: PedidoListProps
   const loadPedidos = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const data = await getPedidos();
       setPedidos(data);
@@ -50,13 +50,13 @@ export default function PedidoList({ refresh, onPedidoDeleted }: PedidoListProps
 
     try {
       await deletePedido((pedidoId));
-      
+
       // Actualizar la lista local removiendo el pedido eliminado
       setPedidos(prev => prev.filter(pedido => pedido.id !== pedidoId));
-      
+
       // Notificar al componente padre si existe el callback
       onPedidoDeleted?.();
-      
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error al eliminar pedido';
       console.error('Error al eliminar pedido:', errorMessage);
@@ -167,7 +167,7 @@ export default function PedidoList({ refresh, onPedidoDeleted }: PedidoListProps
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {pedidos.map((pedido, index) => (
-                <tr 
+                <tr
                   key={pedido.id || index}
                   className="hover:bg-gray-50 transition-colors"
                 >
@@ -193,36 +193,32 @@ export default function PedidoList({ refresh, onPedidoDeleted }: PedidoListProps
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
+                  <td className="px-6 py-4 whitespace-nowrap text-right flex space-x-2">
                     <button
                       onClick={() => handleDeletePedido(pedido.id, pedido.distribuidor)}
                       disabled={deletingId === pedido.id}
-                      className={`inline-flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 ${
-                        deletingId === pedido.id
-                          ? 'bg-gray-100 cursor-not-allowed'
-                          : 'text-gray-400 hover:text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
-                      }`}
-                      title={deletingId === pedido.id ? 'Eliminando...' : 'Eliminar pedido'}
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-full text-gray-400 hover:text-red-600 hover:bg-red-50"
+                      title="Eliminar pedido"
                     >
-                      {deletingId === pedido.id ? (
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
-                      ) : (
-                        <svg 
-                          className="w-4 h-4" 
-                          fill="none" 
-                          stroke="currentColor" 
-                          viewBox="0 0 24 24"
-                        >
-                          <path 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round" 
-                            strokeWidth={2} 
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" 
-                          />
-                        </svg>
-                      )}
+                      🗑
+                    </button>
+
+                    <button
+                      onClick={async () => {
+                        try {
+                          await addPagado(pedido);
+                          await handleDeletePedido(pedido.id, pedido.distribuidor);
+                        } catch (error) {
+                          alert('Error marcando como pagado');
+                        }
+                      }}
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-full text-gray-400 hover:text-green-600 hover:bg-green-50"
+                      title="Marcar como pagado"
+                    >
+                      ✅
                     </button>
                   </td>
+
                 </tr>
               ))}
             </tbody>

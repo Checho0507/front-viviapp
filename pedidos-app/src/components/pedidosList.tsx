@@ -66,6 +66,33 @@ export default function PedidoList({ refresh, onPedidoDeleted }: PedidoListProps
     }
   };
 
+  const handlePedido = async (pedidoId: string | number, distribuidor: string) => {
+    const confirmDelete = window.confirm(
+      `¿Estás seguro de que quieres marcar el pedido de "${distribuidor} como pagado"?\n\nEsta acción no se puede deshacer.`
+    );
+
+    if (!confirmDelete) return;
+
+    setDeletingId(pedidoId);
+
+    try {
+      await deletePedido((pedidoId));
+
+      // Actualizar la lista local removiendo el pedido eliminado
+      setPedidos(prev => prev.filter(pedido => pedido.id !== pedidoId));
+
+      // Notificar al componente padre si existe el callback
+      onPedidoDeleted?.();
+
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al eliminar pedido';
+      console.error('Error al eliminar pedido:', errorMessage);
+      alert(`Error al eliminar pedido: ${errorMessage}`);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   useEffect(() => {
     loadPedidos();
   }, [refresh, loadPedidos]);
@@ -207,7 +234,7 @@ export default function PedidoList({ refresh, onPedidoDeleted }: PedidoListProps
                       onClick={async () => {
                         try {
                           await addPagado(pedido);
-                          await handleDeletePedido(pedido.id, pedido.distribuidor);
+                          await handlePedido(pedido.id, pedido.distribuidor);
                         } catch (error) {
                           alert('Error marcando como pagado');
                         }

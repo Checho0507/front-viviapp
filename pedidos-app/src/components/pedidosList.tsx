@@ -68,7 +68,7 @@ export default function PedidoList({ refresh, onPedidoDeleted }: PedidoListProps
 
   const handlePedido = async (pedidoId: string | number, distribuidor: string) => {
     const confirmDelete = window.confirm(
-      `¿Estás seguro de que quieres marcar el pedido de "${distribuidor} como pagado"?\n\nEsta acción no se puede deshacer.`
+      `¿Estás seguro de que quieres marcar el pedido de "${distribuidor}" como pagado?\n\nEsta acción no se puede deshacer.`
     );
 
     if (!confirmDelete) return;
